@@ -81,4 +81,104 @@
         <tag>springboot</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Redis分布式锁</title>
+    <url>/2024/04/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</url>
+    <content><![CDATA[<h1 id="分布式锁执行流程"><a href="#分布式锁执行流程" class="headerlink" title="分布式锁执行流程"></a>分布式锁执行流程</h1><h2 id="实现分布式锁时需要实现的两个基本方法："><a href="#实现分布式锁时需要实现的两个基本方法：" class="headerlink" title="实现分布式锁时需要实现的两个基本方法："></a>实现分布式锁时需要实现的两个基本方法：</h2><p>获取锁：</p>
+<p>互斥：确保只能有一个线程获取锁<br>非阻塞：尝试一次，成功返回true，失败返回false</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"># 添加锁，<span class="variable constant_">NX</span>是（<span class="keyword">if</span> not exist）只有该键不存在才set成功否则set失败，<span class="variable constant_">EX</span>是设置超时时间</span><br><span class="line"><span class="variable constant_">SET</span> lock thread <span class="variable constant_">NX</span> <span class="variable constant_">EX</span> <span class="number">10</span></span><br></pre></td></tr></table></figure></div>
+<p>释放锁：</p>
+<p>手动释放<br>超时释放：获取锁时添加一个超时时间</p>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line"># 释放锁，删除即可</span><br><span class="line"><span class="variable constant_">DEL</span> key</span><br></pre></td></tr></table></figure></div>
+<h2 id="分布式锁初级版本"><a href="#分布式锁初级版本" class="headerlink" title="分布式锁初级版本"></a>分布式锁初级版本</h2><div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">public interface <span class="title class_">ILock</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 非阻塞方式，尝试获取锁</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> timeoutSec 锁持有的超时时间，过期后自动释放</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> true代表获取锁成功; false代表获取锁失败</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    boolean <span class="title function_">tryLock</span>(long timeoutSec);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 释放锁</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">unlock</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">public <span class="keyword">class</span> <span class="title class_">SimpleRedisLock</span> implements <span class="title class_">ILock</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 业务名称</span></span><br><span class="line">    private <span class="title class_">String</span> name;</span><br><span class="line">    private <span class="title class_">StringRedisTemplate</span> stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 通过构造方法将name和stringRedisTemplate传入</span></span><br><span class="line">    public <span class="title class_">SimpleRedisLock</span>(<span class="title class_">String</span> name, <span class="title class_">StringRedisTemplate</span> stringRedisTemplate) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">name</span> = name;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">stringRedisTemplate</span> = stringRedisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private <span class="keyword">static</span> final <span class="title class_">String</span> <span class="variable constant_">KEY_PREFIX</span> = <span class="string">&quot;lock:&quot;</span>;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public boolean <span class="title function_">tryLock</span>(<span class="params">long timeoutSec</span>) &#123;</span><br><span class="line">        <span class="comment">// 获取线程标识</span></span><br><span class="line">        long threadId = <span class="title class_">Thread</span>.<span class="title function_">currentThread</span>().<span class="title function_">getId</span>();</span><br><span class="line">        <span class="comment">// 获取锁</span></span><br><span class="line">        <span class="title class_">Boolean</span> success = stringRedisTemplate.<span class="title function_">opsForValue</span>()</span><br><span class="line">                .<span class="title function_">setIfAbsent</span>(<span class="variable constant_">KEY_PREFIX</span> + name, threadId + <span class="string">&quot;&quot;</span>, timeoutSec, <span class="title class_">TimeUnit</span>.<span class="property">SECONDS</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="title class_">Boolean</span>.<span class="property">TRUE</span>.<span class="title function_">equals</span>(success);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">unlock</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">//通过del删除锁</span></span><br><span class="line">        stringRedisTemplate.<span class="title function_">delete</span>(<span class="variable constant_">KEY_PREFIX</span> + name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="Redis分布式锁误删问题"><a href="#Redis分布式锁误删问题" class="headerlink" title="Redis分布式锁误删问题"></a>Redis分布式锁误删问题</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_14.png"
+                      alt="1. List item"
+                ></p>
+<h3 id="误删第一种情况如图上"><a href="#误删第一种情况如图上" class="headerlink" title="误删第一种情况如图上"></a>误删第一种情况如图上</h3><ol>
+<li>线程1获得了锁但是业务发生了阻塞，一直阻塞到该锁自动释放</li>
+<li>释放后线程2获得了锁开始执行业务，此时线程1不再阻塞业务开始执行</li>
+<li>线程1业务先于线程2完成并释放锁，此时线程1释放的是线程2的锁，</li>
+<li>线程2的锁被线程1释放后线程3再次获得锁执行业务引发类似的线程不安全问题</li>
+</ol>
+<h3 id="解决第一种误删问题"><a href="#解决第一种误删问题" class="headerlink" title="解决第一种误删问题"></a>解决第一种误删问题</h3><p>在获得锁的时候存入线程标识可以用（UUID）表示</p>
+<p>在释放锁时先获取锁中的线程标识，判断是否与当前线程标识一致</p>
+<ul>
+<li>如果一致则释放锁</li>
+<li>如果不一致则不释放锁</li>
+<li>注意：不要直接将线程id作为线程标识，因为不同JVM中的线程id可能一样，所以可以用 线程id+UUID 作为线程标识</li>
+</ul>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">public <span class="keyword">class</span> <span class="title class_">SimpleRedisLock</span> implements <span class="title class_">ILock</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 业务名称</span></span><br><span class="line">    private <span class="title class_">String</span> name;</span><br><span class="line">    private <span class="title class_">StringRedisTemplate</span> stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过构造方法将name和stringRedisTemplate传入</span></span><br><span class="line">    public <span class="title class_">SimpleRedisLock</span>(<span class="title class_">String</span> name, <span class="title class_">StringRedisTemplate</span> stringRedisTemplate) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">name</span> = name;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">stringRedisTemplate</span> = stringRedisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private <span class="keyword">static</span> final <span class="title class_">String</span> <span class="variable constant_">KEY_PREFIX</span> = <span class="string">&quot;lock:&quot;</span>;</span><br><span class="line">    private <span class="keyword">static</span> final <span class="title class_">String</span> <span class="variable constant_">ID_PREFIX</span> = <span class="variable constant_">UUID</span>.<span class="title function_">randomUUID</span>().<span class="title function_">toString</span>(<span class="literal">true</span>) + <span class="string">&quot;-&quot;</span>;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public boolean <span class="title function_">tryLock</span>(<span class="params">long timeoutSec</span>) &#123;</span><br><span class="line">        <span class="comment">// 获取线程标识</span></span><br><span class="line">        <span class="title class_">String</span> threadId = <span class="variable constant_">ID_PREFIX</span> + <span class="title class_">Thread</span>.<span class="title function_">currentThread</span>().<span class="title function_">getId</span>();</span><br><span class="line">        <span class="comment">// 获取锁</span></span><br><span class="line">        <span class="title class_">Boolean</span> success = stringRedisTemplate.<span class="title function_">opsForValue</span>()</span><br><span class="line">                .<span class="title function_">setIfAbsent</span>(<span class="variable constant_">KEY_PREFIX</span> + name, threadId, timeoutSec, <span class="title class_">TimeUnit</span>.<span class="property">SECONDS</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="title class_">Boolean</span>.<span class="property">TRUE</span>.<span class="title function_">equals</span>(success);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Override</span></span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">unlock</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="comment">// 获取线程标识</span></span><br><span class="line">        <span class="title class_">String</span> threadId = <span class="variable constant_">ID_PREFIX</span> + <span class="title class_">Thread</span>.<span class="title function_">currentThread</span>().<span class="title function_">getId</span>();</span><br><span class="line">        <span class="comment">// 获取锁中的标识</span></span><br><span class="line">        <span class="title class_">String</span> id = stringRedisTemplate.<span class="title function_">opsForValue</span>().<span class="title function_">get</span>(<span class="variable constant_">KEY_PREFIX</span> + name);</span><br><span class="line">        <span class="comment">// 判断标识是否一致</span></span><br><span class="line">        <span class="keyword">if</span>(threadId.<span class="title function_">equals</span>(id)) &#123;</span><br><span class="line">            <span class="comment">// 释放锁</span></span><br><span class="line">            stringRedisTemplate.<span class="title function_">delete</span>(<span class="variable constant_">KEY_PREFIX</span> + name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_15.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="误删第二种情况如图上"><a href="#误删第二种情况如图上" class="headerlink" title="误删第二种情况如图上"></a>误删第二种情况如图上</h3><ol>
+<li>线程1获得了锁开始执行业务,再执行到unlock方法中的时候，获取了锁标识，并判断了是一致的</li>
+<li>即以及进入到if条件判断里面此时由于某种原因发生了阻塞，阻塞到线程1的锁超时释放，线程2获得了锁。</li>
+<li>此时在线程2执行业务的时候，线程1不再阻塞即要删除线程1的锁，但此时删除的为线程2的锁这再次造成了线程不安全问题。</li>
+</ol>
+<h3 id="解决第二种误删问题"><a href="#解决第二种误删问题" class="headerlink" title="解决第二种误删问题"></a>解决第二种误删问题</h3><p>第二种误删问题本质是原子性问题unlock方法不是原子性操作，可通过lua脚本实现<br>此时区分两个概念数据库的原子性操作是<strong>要么都成功要么都失败</strong>，并发编程中指的原子性是，<strong>操作不可拆分、不被中断</strong> 举例来说，当前unlock方法有两redis命令操作，给redis执行的时候是两个任务在任务队列中，中间可能有其他的任务，此时不是原子性的，而经过lua脚本编程实现的这两条命令被封装成了一个任务给redis执行，中间不会插入任何其他的任务，因此解决了此时的误删问题。</p>
+<h3 id="并发执行问题"><a href="#并发执行问题" class="headerlink" title="并发执行问题"></a>并发执行问题</h3><p>假设当前线程1执行业务时间过长导致了锁超时自动释放，而线程2此时获得了锁此时造成了并发执行的问题。</p>
+<h3 id="并发执行问题解决"><a href="#并发执行问题解决" class="headerlink" title="并发执行问题解决"></a>并发执行问题解决</h3><p>Redission看门狗机制解决</p>
+<p>redission中提供的续期机制<br>redisson 中提供的续期机制 开一个监听线程，如果方法还没执行完，就帮你重置 redis 锁的过期时间。 原理：</p>
+<ol>
+<li>监听当前线程，默认过期时间是 30 秒，每 10 秒续期一次（补到 30 秒）</li>
+<li>如果线程挂掉（注意 debug 模式也会被它当成服务器宕机），则不会续期</li>
+</ol>
+<div class="highlight-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.redisson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>redisson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">version</span>&gt;</span>3.18.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span></span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line"> @<span class="title class_">Resource</span></span><br><span class="line">    private <span class="title class_">RedissonClient</span> redissonClient;</span><br><span class="line"></span><br><span class="line">    @<span class="title class_">Scheduled</span>(cron = <span class="string">&quot;0 59 23 * * *&quot;</span>)</span><br><span class="line">    public <span class="keyword">void</span> <span class="title function_">doCacheRecommendUser</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="title class_">RLock</span> lock = redissonClient.<span class="title function_">getLock</span>(<span class="string">&quot;friend:precachejob:docache:lock&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (lock.<span class="title function_">tryLock</span>(<span class="number">0</span>, 30000L, <span class="title class_">TimeUnit</span>.<span class="property">MILLISECONDS</span>)) &#123;</span><br><span class="line">                   <span class="comment">//实际业务逻辑</span></span><br><span class="line">                    &#125; <span class="keyword">catch</span> (<span class="title class_">Exception</span> e) &#123;</span><br><span class="line">                        log.<span class="title function_">error</span>(<span class="string">&quot;redis set memory error&quot;</span>, e);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="title class_">Exception</span> e) &#123;</span><br><span class="line">            log.<span class="title function_">error</span>(<span class="string">&quot;doCacheCommendUser error&quot;</span>, e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (lock.<span class="title function_">isHeldByCurrentThread</span>()) &#123;</span><br><span class="line">                lock.<span class="title function_">unlock</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis分布式登录</title>
+    <url>/2024/04/13/Redis%E5%88%86%E5%B8%83%E5%BC%8F%E7%99%BB%E5%BD%95/</url>
+    <content><![CDATA[<h1 id="Session-共享"><a href="#Session-共享" class="headerlink" title="Session 共享"></a>Session 共享</h1><p>session的实现基于cookie后端设置session的时候会由cookie返回给前端一个sessionid在cookie里面，之后每次前端请求会带上该sessiond后端以此来获取当前用户的session来判断用户是否登录。</p>
+<h2 id="为什么服务器A登录后，请求发到服务器B，不认识该用户？"><a href="#为什么服务器A登录后，请求发到服务器B，不认识该用户？" class="headerlink" title="为什么服务器A登录后，请求发到服务器B，不认识该用户？"></a>为什么服务器A登录后，请求发到服务器B，不认识该用户？</h2><p>用户在A登录，所以session存在了A上，用户的session信息并没有存在B上服务器B不认识用户<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_16.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>共享存储，而不是把数据放到单台服务器的内存中，用Redis实现分布式登录，springboot提供了现成的解决方案，引入坐标修改配置即可实现Redis存储session<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_17.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_18.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_19.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_20.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis分布式登录</tag>
+      </tags>
+  </entry>
 </search>
