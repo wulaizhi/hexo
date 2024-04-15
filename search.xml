@@ -181,4 +181,178 @@
         <tag>Redis分布式登录</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Juc之Synchronized原理</title>
+    <url>/2024/04/15/Juc%E4%B9%8BSynchronized%E5%8E%9F%E7%90%86/</url>
+    <content><![CDATA[<h1 id="对象头的概念"><a href="#对象头的概念" class="headerlink" title="对象头的概念"></a>对象头的概念</h1><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_21.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_22.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="如上图所示"><a href="#如上图所示" class="headerlink" title="如上图所示"></a>如上图所示</h2><p>每个JavaObject的字节码文件的头多少位称为Java的对象头，其中有32位</p>
+<ul>
+<li>MarkWord字段最后两位位当前Object的状态，一共有5种状态，分别为<strong>Normal(正常状态)</strong>,**Biased(偏向状态),Lightweight Locked(轻量级锁状态),Heeavyweight Locked(重量级锁),(Marked for Gc)(标记被Gc垃圾回收期回收的状态)**，</li>
+<li>KlassWord是个指针指向该对象的类(type.class)对象，</li>
+<li>hashcode为每个对象的hashcode，</li>
+<li>age为每个对象的迭代年龄和jvm垃圾回收有关</li>
+<li>ptr_to_heavyweight_monitor指向monitor对象的指针</li>
+<li>ptr_to_lock_record 指向锁记录的指针</li>
+</ul>
+<h2 id="再来介绍操作系统Monitor-管程-监视器"><a href="#再来介绍操作系统Monitor-管程-监视器" class="headerlink" title="再来介绍操作系统Monitor(管程,监视器)"></a>再来介绍操作系统Monitor(管程,监视器)</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_23.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_24.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_25.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<ul>
+<li>Owner（当前monitor的所有线程）</li>
+<li>WaitSet (等待队列)</li>
+<li>EntryList (阻塞队列)</li>
+</ul>
+<h1 id="Synchronized-锁优化"><a href="#Synchronized-锁优化" class="headerlink" title="Synchronized 锁优化"></a>Synchronized 锁优化</h1><h2 id="轻量级锁优化"><a href="#轻量级锁优化" class="headerlink" title="轻量级锁优化"></a>轻量级锁优化</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_26.png"
+                      alt="在这里插入图片描述"
+                ><br>加锁时优先加轻量级锁，当不满足需要时才升级为重量级锁<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_27.png"
+                      alt="在这里插入图片描述"
+                ><br>object第一行为markword字段，第二行为指向当前对象的类对象指针<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_28.png"
+                      alt="在这里插入图片描述"
+                ><br>此时会进行cas交换对象头的markword字段交换如果对象头种的状态为01（Normal）正常状态即可替换成功<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_29.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_30.png"
+                      alt="在这里插入图片描述"
+                ><br>如果当前锁记录已经为</p>
+<ul>
+<li>（00)轻量级锁状态，此时有其他的线程竞争获取当前锁会进入锁膨胀，</li>
+<li>如果此时当前线程重复对当前对象加锁（称为锁重入）会在栈帧中创建一个新的锁记录，锁记录的第一行为null</li>
+</ul>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_31.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_32.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="锁膨胀"><a href="#锁膨胀" class="headerlink" title="锁膨胀"></a>锁膨胀</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_33.png"
+                      alt="在这里插入图片描述"
+                ><br>将轻量级锁升级为重量级锁，当前对象以及被加了轻量级锁，此时再次被其他线程加轻量级锁，此时会升级为重量级锁。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_34.png"
+                      alt="在这里插入图片描述"
+                ><br>此时进入锁膨胀过程，此时线程1会给object对象申请Monitor锁，让Object的MarkWord字段指向Monitor并改变MorkWord的状态为重量级锁状态（10），把Monitor的Owner的值设置为指向线程0，此时线程1会进入EntryList进行等待。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_35.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="自旋优化"><a href="#自旋优化" class="headerlink" title="自旋优化"></a>自旋优化</h2><p>重量级锁竞争发生在已经申请了monitor对象后的线程竞争获得锁的状态（目的是为了避免线程的上下文切换）。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_36.png"
+                      alt="在这里插入图片描述"
+                ><br>当monitor对象的owner里面已经有线程了，此时第二个线程过来不会立刻进入阻塞队列而是会重试判断当前锁释放已经释放称为自旋优化。</p>
+<h2 id="偏向锁优化"><a href="#偏向锁优化" class="headerlink" title="偏向锁优化"></a>偏向锁优化</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_37.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_38.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_39.png"
+                      alt="在这里插入图片描述"
+                ><br>区别于之前的替换对象头中的<strong>MarkWord的锁的状态</strong> 此时只有在第一次将当前线程id替换到MarkWord字段，之后当前线程再次对当前对象加锁会判断当前线程id是否是自己，如果是不做操作当前对象依然归当前线程所有（线程id替换到markword的thread字段）</p>
+<h2 id="偏向状态"><a href="#偏向状态" class="headerlink" title="偏向状态"></a>偏向状态</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_40.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="偏向锁撤销"><a href="#偏向锁撤销" class="headerlink" title="偏向锁撤销"></a>偏向锁撤销</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_41.png"
+                      alt="在这里插入图片描述"
+                ><br>刚开始加轻量级锁monitor对象markword头被替换为01状态的头部里面没有hashcode，如果调用hashcode方法线程会将栈帧里面原来的所记录替换回来，此时有hashcode可以用，轻量级锁记录有哈是从的，和重量级锁会在monitor中记录hashcode。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_42.png"
+                      alt="在这里插入图片描述"
+                ><br>其他线程使用对该对象加锁，但是没有发生竞争，此时会撤销原来的偏向锁，升级为轻量级锁，第二个线程撤销锁的时候将轻量级锁撤销此时是无锁状态<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_43.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_44.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_45.png"
+                      alt="在这里插入图片描述"
+                ><br>刚开始30个对象偏向到线程1，之后这30个对象被线程2使用发生了偏向偏向锁撤销，会升级为轻量级锁，当同一线程的偏向对象被撤销的时候超过某一个阈值的时候会把剩下的对象全部偏向为线程2<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_46.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_47.png"
+                      alt="在这里插入图片描述"
+                ><br>对加锁的优化比如当前锁对象不会被共享，加了和没加一样此时会自动消除锁优化</p>
+]]></content>
+      <categories>
+        <category>Juc</category>
+      </categories>
+      <tags>
+        <tag>Juc之Synchronized原理</tag>
+      </tags>
+  </entry>
 </search>
