@@ -355,4 +355,256 @@
         <tag>Juc之Synchronized原理</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Juc之ReentranLock原理</title>
+    <url>/2024/04/16/Juc%E4%B9%8BReentranLock%E5%8E%9F%E7%90%86/</url>
+    <content><![CDATA[<h1 id="ReentrantLock简介"><a href="#ReentrantLock简介" class="headerlink" title="ReentrantLock简介"></a>ReentrantLock简介</h1><h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_48.png"
+                      alt="在这里插入图片描述"
+                ></h2><h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li><p>可重入（允许当前线程获得了该锁之后再次加锁）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_49.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>可打断（当前线程如果有竞争就进入阻塞队列，可以被其他线程用interrupt方法打断等待状态此时会抛出异常）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_50.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>锁超时（可以用tryLock方法加锁并且支持加等待时间超过等待时间没有得到锁返回false）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_51.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>公平锁（可以在创建锁的时候设置true或false，公平锁为true默认为不公平锁，公平锁在阻塞队列中是按照进入的顺序获得锁而不是再次竞争）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_52.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+<li><p>条件变量ReentrantLock支持多条件变量<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_53.png"
+                      alt="在这里插入图片描述"
+                ></p>
+</li>
+</ul>
+<h2 id="与synchronized对比"><a href="#与synchronized对比" class="headerlink" title="与synchronized对比"></a>与synchronized对比<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_54.png"
+                      alt="在这里插入图片描述"
+                ></h2><h1 id="ReentrantLock原理"><a href="#ReentrantLock原理" class="headerlink" title="ReentrantLock原理"></a>ReentrantLock原理</h1><h2 id="AQS原理"><a href="#AQS原理" class="headerlink" title="AQS原理"></a>AQS原理</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_55.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_56.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_57.png"
+                      alt="在这里插入图片描述"
+                ><br>AQSjava中本质是一个抽象类。ReentrantLock用到了该类的对象<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_58.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_59.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_60.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="加锁成功流程"><a href="#加锁成功流程" class="headerlink" title="加锁成功流程"></a>加锁成功流程</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_61.png"
+                      alt="在这里插入图片描述"
+                ><br>Sync继承AQS是一个抽象类有两个实现类一个是NonfairSync和FairSync公平锁和非公平锁， ReentrantLock继承了Lock接口Node是AQS中的节点。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_62.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_63.png"
+                      alt="在这里插入图片描述"
+                ><br>当没有竞争的时候加锁会执行以上方法秀爱state的值为1，并把当前线程设置到exclusiveOwnerThread.<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_64.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_65.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_66.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_67.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_68.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_69.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_70.png"
+                      alt="在这里插入图片描述"
+                ><br>获得（第一次）锁失败后再次尝试（第二次）获得锁再次失败会构造当前线程对应节点，如果处于第二个节点即头节点之后会再次（第三次）尝试获得锁，失败后然后会把前驱节点的状态改为-1表示有责任唤醒后继节点最终进入阻塞（park）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_71.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_72.png"
+                      alt="在这里插入图片描述"
+                ><br>释放锁的流程<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_73.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_74.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_75.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_76.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="可重入原理"><a href="#可重入原理" class="headerlink" title="可重入原理"></a>可重入原理</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_77.png"
+                      alt="在这里插入图片描述"
+                ><br>当前线程再次加锁会把state进行累加，释放的时候会把当前state进行减一</p>
+<h2 id="不可打断原理"><a href="#不可打断原理" class="headerlink" title="不可打断原理"></a>不可打断原理</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_78.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_79.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_80.png"
+                      alt="在这里插入图片描述"
+                ><br>不可打断模式当Thread.interruped被设置为真时会进入if把interruped设置为true知道获得锁之后返回true当前线程会被终止</p>
+<h2 id="可打断原理"><a href="#可打断原理" class="headerlink" title="可打断原理"></a>可打断原理</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_81.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_82.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_83.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>当Thread.interruped被设置为真时会进入if会直接抛出异常终止不会等到获得锁之后停止</p>
+<h2 id="公平锁实现原理"><a href="#公平锁实现原理" class="headerlink" title="公平锁实现原理"></a>公平锁实现原理</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_84.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_85.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="条件变量实现原理"><a href="#条件变量实现原理" class="headerlink" title="条件变量实现原理"></a>条件变量实现原理</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_86.png"
+                      alt="在这里插入图片描述"
+                ><br>当前线程调用await会创建节点加到condition队列中并设置状态为-2<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_87.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_88.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_89.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_90.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_91.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+      <categories>
+        <category>Juc</category>
+      </categories>
+      <tags>
+        <tag>Juc之ReentranLock原理</tag>
+      </tags>
+  </entry>
 </search>
