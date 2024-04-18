@@ -739,4 +739,142 @@
         <tag>JMM</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Juc之无锁并发</title>
+    <url>/2024/04/18/Juc%E4%B9%8B%E6%97%A0%E9%94%81%E5%B9%B6%E5%8F%91/</url>
+    <content><![CDATA[<h2 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_115.png"
+                      alt="在这里插入图片描述"
+                ><br>cas基于的思想就是比较和设置<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_116.png"
+                      alt="在这里插入图片描述"
+                ><br>线程1获取余额的值为100，此时减少10为90，此时线程2修改为80，此时线程1去修改的时候会先用100，与最新的结果进行对比，100和80不相等此时修改失败，这样的拿到原值和最新的原值比较是否相等相等修改成功否则继续循环获取再次尝试修改。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_117.png"
+                      alt="在这里插入图片描述"
+                ><br>cas操作需要配合volatile来保证每次获得的数据为最新值而不是从cpu缓存拿到的值即可见性。</p>
+<h2 id="CAS特点"><a href="#CAS特点" class="headerlink" title="CAS特点"></a>CAS特点<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_118.png"
+                      alt="在这里插入图片描述"
+                ></h2><h2 id="原子整数"><a href="#原子整数" class="headerlink" title="原子整数"></a>原子整数</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_119.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="CAS效率分析"><a href="#CAS效率分析" class="headerlink" title="CAS效率分析"></a>CAS效率分析</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_120.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_121.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="原子引用"><a href="#原子引用" class="headerlink" title="原子引用"></a>原子引用<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_122.png"
+                      alt="在这里插入图片描述"
+                ></h2><p>用原子引用是为了保护不是基本类型的数据<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_123.png"
+                      alt="在这里插入图片描述"
+                ><br>ABA问题，主线程无法感知到对共享变量的修改比如刚开始为A，主线程要改成C，刚开始主线程获取A，但是在这之间可能有其他线程将A修改为M再由M修改为A，此时主线程对比值还是一样的还是能修改成功但是无法感知之间的变化<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_124.png"
+                      alt="在这里插入图片描述"
+                ><br>这个原子引用可以判断出来ABA问题，多了一个版本号<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_125.png"
+                      alt="在这里插入图片描述"
+                ><br>第二个版本号的简化版本，用布尔值记录是否改变布尔值自己初始化<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_126.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_127.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="原子数组"><a href="#原子数组" class="headerlink" title="原子数组"></a>原子数组</h2><p>实现了对数组的原子性操作<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_128.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_129.png"
+                      alt="在这里插入图片描述"
+                ><br>函数式接口<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_130.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_131.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_132.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="原子更新器"><a href="#原子更新器" class="headerlink" title="原子更新器"></a>原子更新器</h2><p>创建对象时参数为哪个类，成员变量的类型，成员变量方法名，实现对对象属性的cas操作。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_133.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_134.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="原子累加器"><a href="#原子累加器" class="headerlink" title="原子累加器"></a>原子累加器</h2><p>累加器内部可以有多个累加的数字多个线程同时累加多个数字最后求和<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_135.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_136.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_137.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="累加器原理"><a href="#累加器原理" class="headerlink" title="累加器原理"></a>累加器原理<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_138.png"
+                      alt="在这里插入图片描述"
+                ></h2>]]></content>
+      <categories>
+        <category>Juc</category>
+      </categories>
+      <tags>
+        <tag>Juc之无锁并发</tag>
+      </tags>
+  </entry>
 </search>
