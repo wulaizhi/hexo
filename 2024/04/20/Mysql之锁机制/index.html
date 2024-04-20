@@ -13,20 +13,48 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="https://wulaizhi.github.io/essays/"/>
+    <link rel="canonical" href="https://wulaizhi.github.io/2024/04/20/mysql之锁机制/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta property="og:type" content="website">
-<meta property="og:title" content="essays">
-<meta property="og:url" content="https://wulaizhi.github.io/essays/index.html">
+        <meta name="description" content="Mysql之锁机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql之锁机制">
+<meta property="og:url" content="https://wulaizhi.github.io/2024/04/20/Mysql%E4%B9%8B%E9%94%81%E6%9C%BA%E5%88%B6/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Mysql之锁机制">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-04-17T15:46:27.000Z">
-<meta property="article:modified_time" content="2024-04-17T15:46:27.799Z">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_139.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_140.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_141.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_142.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_143.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_144.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_145.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_146.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_147.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_148.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_149.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_150.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_151.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_152.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_153.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_154.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_155.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_156.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_157.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_158.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_159.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_160.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_161.png">
+<meta property="og:image" content="https://wulaizhi.github.io/images/img_162.png">
+<meta property="article:published_time" content="2024-04-20T14:48:22.466Z">
+<meta property="article:modified_time" content="2024-04-20T14:53:47.266Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Mysql">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wulaizhi.github.io/images/img_139.png">
     
     
     <!--- Icon Part-->
@@ -38,7 +66,7 @@
     
     <title>
         
-            essays -
+            Mysql之锁机制 -
         
         武来只Blog
     </title>
@@ -383,7 +411,7 @@
 
                             <li class="navbar-item">
                                 <!-- Menu -->
-                                <a class="active"
+                                <a class=""
                                    href="/essays"
                                         >
                                     <i class="fa-solid fa-comment fa-fw"></i>
@@ -524,7 +552,7 @@
 
                     <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
                         
-                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
                            href="/essays"
                         >
                             <span>
@@ -581,48 +609,333 @@
             <div class="main-content">
 
                 
-                    <div class="page-template-container">
-    
-    
-    
-        <div class="mb-4">
-    <h1 class="page-title-header">essays</h1>
-    <ul class="flex flex-col mb-4 gap-6">
-        
-        
-            <li class="w-full flex flex-row relative">
-                <div class="w-10 h-10 mr-4 rounded-lg overflow-hidden border border-border-color p-[1px] flex-shrink-0"><img src="/images/avatar.jpg" class="w-full h-full rounded-[6.2px]"></div>
-                <div class="w-full border-border-color rounded-xl rounded-tl-none redefine-box-shadow-flat overflow-hidden">
-                    <div class="px-4 py-1.5 text-sm border-b border-border-color bg-zinc-50 dark:bg-zinc-800 text-third-text-color">Last Thursday at 8:00 PM</div>
-                    <div id="shuoshuo-content" class="px-4 py-2"><p>人生如梦,我不想死</p>
-</div>
+                    <div class="post-page-container flex relative justify-between box-border w-full h-full">
+    <div class="article-content-container">
+
+        <div class="article-title relative w-full">
+            
+                
+                
+                <img src="https://evan.beee.top/img/208184324-f2640ade-587a-4f46-8ad1-7b4c1b31394f.png" alt="Mysql之锁机制" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75"/>
+                
+                <div class="w-full flex items-center absolute bottom-0 justify-start">
+                    <h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-bold backdrop-blur-lg rounded-xl border border-border-color ">Mysql之锁机制</h1>
                 </div>
-                <div class=" absolute left-[50.5px] top-3 transform w-2 h-2 border-solid border-t border-l bg-zinc-50 -rotate-45 border-border-color dark:bg-zinc-800"></div>
+            
+            </div>
+
+        
+            <div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+                <div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+                    <img src="/images/avatar.jpg">
+                </div>
+                <div class="info flex flex-col justify-between">
+                    <div class="author flex items-center">
+                        <span class="name text-default-text-color text-lg font-semibold">wulaizhi</span>
+                        
+                            <span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-04-20 22:48:22</span>
+        <span class="mobile">2024-04-20 22:48:22</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2024-04-20 22:53:47</span>
+            <span class="mobile">2024-04-20 22:53:47</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/Mysql/">Mysql</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Mysql/">Mysql</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>698 Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>2 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+            <h2 id="全局锁"><a href="#全局锁" class="headerlink" title="全局锁"></a>全局锁</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_139.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="加-解锁命令（加解锁是对整个数据库进行加锁）"><a href="#加-解锁命令（加解锁是对整个数据库进行加锁）" class="headerlink" title="加&#x2F;解锁命令（加解锁是对整个数据库进行加锁）"></a>加&#x2F;解锁命令（加解锁是对整个数据库进行加锁）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_140.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_141.png"
+                      alt="在这里插入图片描述"
+                ><br>MySQL实例则是MySQL服务器运行时的一个具体实例。在一台服务器上可以同时运行多个MySQL实例，每个实例有自己独立的配置、数据目录和端口号。每个MySQL实例可以独立地管理和存储数据库，拥有自己的进程和资源。</p>
+<h2 id="表级锁"><a href="#表级锁" class="headerlink" title="表级锁"></a>表级锁</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_142.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_143.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h4 id="加表读锁的情况"><a href="#加表读锁的情况" class="headerlink" title="加表读锁的情况"></a>加表读锁的情况</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_144.png"
+                      alt="在这里插入图片描述"
+                ><br>客户端1加了表读锁，客户端1和其他客户端可以读，客户端1和其他客户端不可以写。</p>
+<h4 id="加表写锁的情况"><a href="#加表写锁的情况" class="headerlink" title="加表写锁的情况"></a>加表写锁的情况</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_145.png"
+                      alt="在这里插入图片描述"
+                ><br>客户端1加了写锁客户端1可以写和读其他客户端都不可以读和写</p>
+<h3 id="元数据锁"><a href="#元数据锁" class="headerlink" title="元数据锁"></a>元数据锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_146.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>共享读锁（SHARED_READ）和共享写(SHREAD_WRITE)锁都属于MDL读锁<br>排他锁（EXCLUSIVE）属于MDL写锁</p>
+<p>解释<br>当其中一个事务执行查询操作时另一个事务可以执行增删该操作，反之亦然。<br>当其中一个事务执行增删改查任何一个操作时，另一个事务都无法执行修改（会进行阻塞）操作反之亦然。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_147.png"
+                      alt="在这里插入图片描述"
+                ><br>解释<br>如果事务1执行了查询当前表会加SHARED_READ锁，事务2执行增删改由于这两种锁之间是兼容的所以此时该表又加了SHREAD_WRITE锁。<br>如果事务1执行了查询当前表会加SHARED_READ锁，事务2执行了alter语句由于MDL读锁与MDL写锁互斥此时事务2无法加锁成功会进行阻塞状态，直到事务1提交。</p>
+<h3 id="意向锁"><a href="#意向锁" class="headerlink" title="意向锁"></a>意向锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_148.png"
+                      alt="在这里插入图片描述"
+                ><br>当事务1对某表进行按照id进行更新的时候会对当前行加行锁，此时如果事务2再对当前表加表锁会造成行锁表锁冲突为了防止冲突mysql加表锁的时候会一行一行的检查是否加了行锁，但是这样效率太低所以出现了意向锁mysql加表锁之前会判断当前表是否又意向锁以及意向锁的类型来判断是否加表锁。</p>
+<p>有了意向锁后加行锁的时候会加意向锁来给表锁进行标记<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_149.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>意向锁的类型<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_150.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_151.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>当加意向共享锁的时候表锁可以加读锁不能加写锁（加写锁会阻塞直到读锁释放）<br>当加意向排他锁的时候此时表锁的读锁和写锁都不能加（都会阻塞直到事务1提交）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_152.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="行级锁"><a href="#行级锁" class="headerlink" title="行级锁"></a>行级锁</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_153.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="行锁（锁定具体的某一行记录，防止其他事务进行update和delete）"><a href="#行锁（锁定具体的某一行记录，防止其他事务进行update和delete）" class="headerlink" title="行锁（锁定具体的某一行记录，防止其他事务进行update和delete）"></a>行锁（锁定具体的某一行记录，防止其他事务进行update和delete）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_154.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_155.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_156.png"
+                      alt="在这里插入图片描述"
+                ><br>事务1加s事务2也能加s事务2不能加x(会阻塞)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_157.png"
+                      alt="在这里插入图片描述"
+                ><br>行锁升级<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_158.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="间隙锁（保证所有记录的间隙不变）"><a href="#间隙锁（保证所有记录的间隙不变）" class="headerlink" title="间隙锁（保证所有记录的间隙不变）"></a>间隙锁（保证所有记录的间隙不变）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_159.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_160.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_161.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="邻间锁"><a href="#邻间锁" class="headerlink" title="邻间锁"></a>邻间锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_162.png"
+                      alt="在这里插入图片描述"
+                ></p>
+
+        </div>
+
+        
+            <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> Mysql之锁机制</li>
+        <li><strong>Author:</strong> wulaizhi</li>
+        <li><strong>Created at
+                :</strong> 2024-04-20 22:48:22</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2024-04-20 22:53:47
             </li>
         
-            <li class="w-full flex flex-row relative">
-                <div class="w-10 h-10 mr-4 rounded-lg overflow-hidden border border-border-color p-[1px] flex-shrink-0"><img src="/images/avatar.jpg" class="w-full h-full rounded-[6.2px]"></div>
-                <div class="w-full border-border-color rounded-xl rounded-tl-none redefine-box-shadow-flat overflow-hidden">
-                    <div class="px-4 py-1.5 text-sm border-b border-border-color bg-zinc-50 dark:bg-zinc-800 text-third-text-color">Last Wednesday at 8:00 PM</div>
-                    <div id="shuoshuo-content" class="px-4 py-2"><p>我出生了</p>
-</div>
-                </div>
-                <div class=" absolute left-[50.5px] top-3 transform w-2 h-2 border-solid border-t border-l bg-zinc-50 -rotate-45 border-border-color dark:bg-zinc-800"></div>
-            </li>
-        
+        <li>
+            <strong>Link:</strong> https://redefine.ohevan.com/2024/04/20/Mysql之锁机制/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
     </ul>
 </div>
 
-    
-    <div class="page-template-content markdown-body">
+            </div>
         
-            
+
+        
+            <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/Mysql/">#Mysql</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+
+        
+            <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+                
+                
+                    <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+                        <a class="next"
+                        rel="next"
+                        href="/2024/04/18/Juc%E4%B9%8B%E6%97%A0%E9%94%81%E5%B9%B6%E5%8F%91/"
+                        >
+                            <span class="title flex justify-center items-center">
+                                <span class="post-nav-title-item">Juc之无锁并发</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex justify-center items-center">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+
         
     </div>
-    <div class="page-template-comments">
-        
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">On this page</div>
+        <div class="page-title">Mysql之锁机制</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E9%94%81"><span class="nav-text">全局锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0-%E8%A7%A3%E9%94%81%E5%91%BD%E4%BB%A4%EF%BC%88%E5%8A%A0%E8%A7%A3%E9%94%81%E6%98%AF%E5%AF%B9%E6%95%B4%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9B%E8%A1%8C%E5%8A%A0%E9%94%81%EF%BC%89"><span class="nav-text">加&#x2F;解锁命令（加解锁是对整个数据库进行加锁）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E7%BA%A7%E9%94%81"><span class="nav-text">表级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E9%94%81"><span class="nav-text">表锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%83%E6%95%B0%E6%8D%AE%E9%94%81"><span class="nav-text">元数据锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%8F%E5%90%91%E9%94%81"><span class="nav-text">意向锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%8C%E7%BA%A7%E9%94%81"><span class="nav-text">行级锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%8C%E9%94%81%EF%BC%88%E9%94%81%E5%AE%9A%E5%85%B7%E4%BD%93%E7%9A%84%E6%9F%90%E4%B8%80%E8%A1%8C%E8%AE%B0%E5%BD%95%EF%BC%8C%E9%98%B2%E6%AD%A2%E5%85%B6%E4%BB%96%E4%BA%8B%E5%8A%A1%E8%BF%9B%E8%A1%8Cupdate%E5%92%8Cdelete%EF%BC%89"><span class="nav-text">行锁（锁定具体的某一行记录，防止其他事务进行update和delete）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%B4%E9%9A%99%E9%94%81%EF%BC%88%E4%BF%9D%E8%AF%81%E6%89%80%E6%9C%89%E8%AE%B0%E5%BD%95%E7%9A%84%E9%97%B4%E9%9A%99%E4%B8%8D%E5%8F%98%EF%BC%89"><span class="nav-text">间隙锁（保证所有记录的间隙不变）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%82%BB%E9%97%B4%E9%94%81"><span class="nav-text">邻间锁</span></a></li></ol></li></ol>
+
     </div>
 </div>
+        </div>
+    
+</div>
+
 
 
                 
@@ -709,6 +1022,23 @@
         </div>
     </div>
 
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
     
 
     <div class="right-side-tools-container">

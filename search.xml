@@ -877,4 +877,153 @@
         <tag>Juc之无锁并发</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Mysql之锁机制</title>
+    <url>/2024/04/20/Mysql%E4%B9%8B%E9%94%81%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h2 id="全局锁"><a href="#全局锁" class="headerlink" title="全局锁"></a>全局锁</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_139.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="加-解锁命令（加解锁是对整个数据库进行加锁）"><a href="#加-解锁命令（加解锁是对整个数据库进行加锁）" class="headerlink" title="加&#x2F;解锁命令（加解锁是对整个数据库进行加锁）"></a>加&#x2F;解锁命令（加解锁是对整个数据库进行加锁）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_140.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_141.png"
+                      alt="在这里插入图片描述"
+                ><br>MySQL实例则是MySQL服务器运行时的一个具体实例。在一台服务器上可以同时运行多个MySQL实例，每个实例有自己独立的配置、数据目录和端口号。每个MySQL实例可以独立地管理和存储数据库，拥有自己的进程和资源。</p>
+<h2 id="表级锁"><a href="#表级锁" class="headerlink" title="表级锁"></a>表级锁</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_142.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_143.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h4 id="加表读锁的情况"><a href="#加表读锁的情况" class="headerlink" title="加表读锁的情况"></a>加表读锁的情况</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_144.png"
+                      alt="在这里插入图片描述"
+                ><br>客户端1加了表读锁，客户端1和其他客户端可以读，客户端1和其他客户端不可以写。</p>
+<h4 id="加表写锁的情况"><a href="#加表写锁的情况" class="headerlink" title="加表写锁的情况"></a>加表写锁的情况</h4><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_145.png"
+                      alt="在这里插入图片描述"
+                ><br>客户端1加了写锁客户端1可以写和读其他客户端都不可以读和写</p>
+<h3 id="元数据锁"><a href="#元数据锁" class="headerlink" title="元数据锁"></a>元数据锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_146.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>共享读锁（SHARED_READ）和共享写(SHREAD_WRITE)锁都属于MDL读锁<br>排他锁（EXCLUSIVE）属于MDL写锁</p>
+<p>解释<br>当其中一个事务执行查询操作时另一个事务可以执行增删该操作，反之亦然。<br>当其中一个事务执行增删改查任何一个操作时，另一个事务都无法执行修改（会进行阻塞）操作反之亦然。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_147.png"
+                      alt="在这里插入图片描述"
+                ><br>解释<br>如果事务1执行了查询当前表会加SHARED_READ锁，事务2执行增删改由于这两种锁之间是兼容的所以此时该表又加了SHREAD_WRITE锁。<br>如果事务1执行了查询当前表会加SHARED_READ锁，事务2执行了alter语句由于MDL读锁与MDL写锁互斥此时事务2无法加锁成功会进行阻塞状态，直到事务1提交。</p>
+<h3 id="意向锁"><a href="#意向锁" class="headerlink" title="意向锁"></a>意向锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_148.png"
+                      alt="在这里插入图片描述"
+                ><br>当事务1对某表进行按照id进行更新的时候会对当前行加行锁，此时如果事务2再对当前表加表锁会造成行锁表锁冲突为了防止冲突mysql加表锁的时候会一行一行的检查是否加了行锁，但是这样效率太低所以出现了意向锁mysql加表锁之前会判断当前表是否又意向锁以及意向锁的类型来判断是否加表锁。</p>
+<p>有了意向锁后加行锁的时候会加意向锁来给表锁进行标记<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_149.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>意向锁的类型<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_150.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_151.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<p>当加意向共享锁的时候表锁可以加读锁不能加写锁（加写锁会阻塞直到读锁释放）<br>当加意向排他锁的时候此时表锁的读锁和写锁都不能加（都会阻塞直到事务1提交）<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_152.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="行级锁"><a href="#行级锁" class="headerlink" title="行级锁"></a>行级锁</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_153.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="行锁（锁定具体的某一行记录，防止其他事务进行update和delete）"><a href="#行锁（锁定具体的某一行记录，防止其他事务进行update和delete）" class="headerlink" title="行锁（锁定具体的某一行记录，防止其他事务进行update和delete）"></a>行锁（锁定具体的某一行记录，防止其他事务进行update和delete）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_154.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_155.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_156.png"
+                      alt="在这里插入图片描述"
+                ><br>事务1加s事务2也能加s事务2不能加x(会阻塞)<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_157.png"
+                      alt="在这里插入图片描述"
+                ><br>行锁升级<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_158.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="间隙锁（保证所有记录的间隙不变）"><a href="#间隙锁（保证所有记录的间隙不变）" class="headerlink" title="间隙锁（保证所有记录的间隙不变）"></a>间隙锁（保证所有记录的间隙不变）</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_159.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_160.png"
+                      alt="在这里插入图片描述"
+                ><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_161.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="邻间锁"><a href="#邻间锁" class="headerlink" title="邻间锁"></a>邻间锁</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_162.png"
+                      alt="在这里插入图片描述"
+                ></p>
+]]></content>
+      <categories>
+        <category>Mysql</category>
+      </categories>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
 </search>
