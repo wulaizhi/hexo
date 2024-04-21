@@ -75,7 +75,7 @@
 <h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><p>1.vue3，vant移动组件,vue-router,vite构建工具,<br>2.pinia,axios自定义,路由导航守卫，pinia 持久化插件</p>
 ]]></content>
       <categories>
-        <category>在线匹配聊天项目</category>
+        <category>项目</category>
       </categories>
       <tags>
         <tag>springboot</tag>
@@ -1024,6 +1024,95 @@
       </categories>
       <tags>
         <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>api调用平台</title>
+    <url>/2024/04/21/api%E8%B0%83%E7%94%A8%E5%B9%B3%E5%8F%B0/</url>
+    <content><![CDATA[<h2 id="项目图片"><a href="#项目图片" class="headerlink" title="项目图片"></a>项目图片</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_163.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_164.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_165.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_166.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_167.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_168.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>用户可以注册登录并开通接口调用权限、浏览接口、在线调试,还能使用客户端SDK轻松在代码中调用接口。管理员可以接入并发布接口、统计分析各接口调用情况<img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_169.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_170.png"
+                      alt="在这里插入图片描述"
+                ><br>api-f-wulaizhi 为前端项目。<br>api-client-sdk 为客户端调用sdk。<br>api-b-interface 为实际接口服务。<br>api-gateway 为网关实现用户调用的日志打印。签名认证，调用次数统计，黑白名单过滤。<br>api-b-wulaizhi 为后端主项目实现登录，注册，接口上线&#x2F;退出，接口数据统计。</p>
+<h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p>Ant Design Pro<br>React<br>Ant Design Procomponents<br>Umi<br>Umi Requset (Axios 的封装)</p>
+<h2 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h2><p>java Spring boot<br>Spring Boot Starter (SDK 开发)<br>Dubbo SpringCloud Gateway（网关、限流、日志实现）Nacos注册中心</p>
+]]></content>
+      <categories>
+        <category>项目</category>
+      </categories>
+      <tags>
+        <tag>api</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>多功能搜索</title>
+    <url>/2024/04/21/%E5%A4%9A%E5%8A%9F%E8%83%BD%E6%90%9C%E7%B4%A2/</url>
+    <content><![CDATA[<h3 id="项目图片"><a href="#项目图片" class="headerlink" title="项目图片"></a>项目图片</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_171.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_172.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_173.png"
+                      alt="在这里插入图片描述"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/img_174.png"
+                      alt="在这里插入图片描述"
+                ></p>
+<h3 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h3><p>Vue 3, Ant Design Vue 组件库 ,页面状态同步, vue-router,父子通信,axios自定义,防抖,节流</p>
+<h3 id="后端"><a href="#后端" class="headerlink" title="后端"></a>后端</h3><p>MySQL 数据库 Elasticsearch 搜索引擎 jsoup HttpClient 爬虫  门面模式 适配器模式  注册器模式</p>
+]]></content>
+      <categories>
+        <category>项目</category>
+      </categories>
+      <tags>
+        <tag>多功能搜索</tag>
       </tags>
   </entry>
 </search>
